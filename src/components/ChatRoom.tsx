@@ -10,6 +10,10 @@ interface Message {
   username: string;
   message: string;
   created_at: string;
+  file_url?: string;
+  file_name?: string;
+  file_type?: string;
+  file_size?: number;
 }
 
 interface ChatRoomProps {
@@ -93,14 +97,23 @@ export const ChatRoom = ({ username }: ChatRoomProps) => {
     scrollToBottom();
   }, [messages]);
 
-  const sendMessage = async (messageText: string) => {
+  const sendMessage = async (messageText: string, fileData?: { url: string; name: string; type: string; size: number }) => {
     try {
+      const messageData: any = {
+        username,
+        message: messageText || ''
+      };
+
+      if (fileData) {
+        messageData.file_url = fileData.url;
+        messageData.file_name = fileData.name;
+        messageData.file_type = fileData.type;
+        messageData.file_size = fileData.size;
+      }
+
       const { error } = await supabase
         .from('messages')
-        .insert({
-          username,
-          message: messageText
-        });
+        .insert(messageData);
 
       if (error) {
         console.error('Error sending message:', error);
@@ -109,6 +122,28 @@ export const ChatRoom = ({ username }: ChatRoomProps) => {
     } catch (error) {
       console.error('Error:', error);
       toast.error('Failed to send message');
+    }
+  };
+
+  const deleteMessage = async (messageId: string) => {
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .delete()
+        .eq('id', messageId);
+
+      if (error) {
+        console.error('Error deleting message:', error);
+        toast.error('Failed to delete message');
+        return;
+      }
+
+      // Update local state to remove the message
+      setMessages(prev => prev.filter(msg => msg.id !== messageId));
+      toast.success('Message deleted');
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Failed to delete message');
     }
   };
 
@@ -160,6 +195,7 @@ export const ChatRoom = ({ username }: ChatRoomProps) => {
                 message={message}
                 currentUser={username}
                 isNew={newMessageIds.has(message.id)}
+                onDelete={deleteMessage}
               />
             ))
           )}
