@@ -125,9 +125,9 @@ export const ChatMessage = ({ message, currentUser, isNew, onDelete }: ChatMessa
                 </div>
                 <Button
                   size="sm"
-                  variant="outline"
+                  variant="secondary"
                   onClick={handleDownload}
-                  className="shrink-0"
+                  className="shrink-0 bg-white hover:bg-gray-100 text-black border border-gray-200 shadow-sm font-medium"
                 >
                   <Download className="w-3 h-3 mr-1" />
                   Download
