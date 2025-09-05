@@ -17,7 +17,7 @@ interface Message {
 }
 
 interface ChatRoomProps {
-  username: string;
+  username: string | null;
 }
 
 export const ChatRoom = ({ username }: ChatRoomProps) => {
@@ -98,6 +98,11 @@ export const ChatRoom = ({ username }: ChatRoomProps) => {
   }, [messages]);
 
   const sendMessage = async (messageText: string, fileData?: { url: string; name: string; type: string; size: number }) => {
+    if (!username) {
+      toast.error('Please enter your name to send messages');
+      return;
+    }
+    
     try {
       const messageData: any = {
         username,
@@ -169,7 +174,10 @@ export const ChatRoom = ({ username }: ChatRoomProps) => {
             </div>
             <div>
               <h1 className="font-bold text-lg">Universal Chat</h1>
-              <p className="text-sm text-muted-foreground">Welcome, {username}!</p>
+              <p className="text-sm text-muted-foreground">Welcome, {username || "Guest"}!</p>
+              {!username && (
+                <p className="text-xs text-muted-foreground/70">Browse-only mode - can't post messages</p>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -193,7 +201,7 @@ export const ChatRoom = ({ username }: ChatRoomProps) => {
               <ChatMessage
                 key={message.id}
                 message={message}
-                currentUser={username}
+                currentUser={username || null}
                 isNew={newMessageIds.has(message.id)}
                 onDelete={deleteMessage}
               />
@@ -206,7 +214,7 @@ export const ChatRoom = ({ username }: ChatRoomProps) => {
       {/* Input */}
       <div className="sticky bottom-0">
         <div className="max-w-4xl mx-auto">
-          <ChatInput onSendMessage={sendMessage} />
+          <ChatInput onSendMessage={sendMessage} disabled={!username} />
         </div>
       </div>
     </div>

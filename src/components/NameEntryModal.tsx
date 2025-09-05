@@ -7,9 +7,10 @@ import { MessageCircle } from "lucide-react";
 interface NameEntryModalProps {
   open: boolean;
   onNameSubmit: (name: string) => void;
+  onClose: () => void;
 }
 
-export const NameEntryModal = ({ open, onNameSubmit }: NameEntryModalProps) => {
+export const NameEntryModal = ({ open, onNameSubmit, onClose }: NameEntryModalProps) => {
   const [name, setName] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -20,7 +21,7 @@ export const NameEntryModal = ({ open, onNameSubmit }: NameEntryModalProps) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={() => {}}>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="text-center">
           <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center">
@@ -47,6 +48,14 @@ export const NameEntryModal = ({ open, onNameSubmit }: NameEntryModalProps) => {
             disabled={!name.trim()}
           >
             Join Chat
+          </Button>
+          <Button 
+            type="button"
+            variant="outline" 
+            className="w-full py-3 text-lg font-medium"
+            onClick={onClose}
+          >
+            Browse as Guest
           </Button>
         </form>
       </DialogContent>
